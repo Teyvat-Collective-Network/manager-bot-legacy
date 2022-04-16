@@ -135,7 +135,7 @@ export default class PromoteCommand extends BaseSlashCommand {
     }) as (keyof typeof names)[];
 
     context.editOrRespond({
-      content: `<@${args.user.id}>${args.for ? `| ${args.for}` : ''}`,
+      content: `<@${args.user.id}>${args.for ? `| ${context.cluster!.tcn.guilds.get(args.for)?.name}` : ''}`,
       components: [new ComponentActionRow().addSelectMenu({
         label: 'roles',
         options: options.map(role => ({
