@@ -5,6 +5,7 @@ import { ComponentActionRow, ComponentContext } from 'detritus-client/lib/utils'
 
 import { BaseSlashCommand } from './baseCommand';
 import guilds from '../guilds';
+import { updateRoles } from '../lib/update';
 
 const roles = {
   MODERATOR:  1<<0,
@@ -20,6 +21,7 @@ const roles = {
   OBSERVER:   1<<10,
   
   DB:         (1<<6)-1,
+  GUILD:     (1<<9)-1,
 }
 
 const names = {
@@ -153,16 +155,6 @@ export default class PromoteCommand extends BaseSlashCommand {
     const user = context.cluster!.tcn.users.get(args.user.id);
     const guild = args.for && context.cluster!.tcn.guilds.get(args.for);
 
-    // if (!guild) return context.editOrRespond({
-    //   content: 'Guild not found',
-    //   components: [],
-    //   flags: MessageFlags.EPHEMERAL,
-    // });
-
-    const guildRoles = context.data.values?.reduce((acc, role) => acc | (
-      ['VOTER', 'OWNER', 'ADVISOR', 'EXEC', 'OBSERVER'].includes(role) ? 0 : roles[role as keyof typeof names]
-    ), 0) || 0;
-
     const exec = context.data.values!.includes('EXEC');
     const observer = context.data.values!.includes('OBSERVER');
     
@@ -175,10 +167,23 @@ export default class PromoteCommand extends BaseSlashCommand {
       return [key, guild[prop]];
     } )) as { voter: string, owner: string, advisor: string };
 
+    const userRoles = args.options.reduce((acc, role) => (
+      ['VOTER', 'OWNER', 'ADVISOR', 'EXEC', 'OBSERVER'].includes(role) ? acc 
+        : context.data.values!.includes(role)
+          ? acc | roles[role as keyof typeof names]
+          : acc & ~roles[role as keyof typeof names]
+    ), (user?.roles || 0) & roles.DB)
+      | (guildEdit.owner === args.user.id ? roles.OWNER : 0)
+      | (guildEdit.advisor === args.user.id ? roles.ADVISOR : 0)
+      | (guildEdit.voter === args.user.id ? roles.VOTER : 0)
+      | (exec ? roles.EXEC : 0)
+      | (observer ? roles.OBSERVER : 0);
+
+
     const promises = [];
 
     if (user) {
-      if (guild && guildRoles !== (user.roles & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles }));
+      if (guild && (userRoles & roles.DB) !== (user.roles & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: userRoles & roles.DB }));
       if (user.exec !== exec) promises.push(exec
         ? context.cluster!.tcn.api.users.execs.put({ user: user.id })
         : context.cluster!.tcn.api.users.execs(user.id).delete()
@@ -194,35 +199,18 @@ export default class PromoteCommand extends BaseSlashCommand {
       || guild.ownerId !== guildEdit.owner
       || guild.voterId !== guildEdit.voter
     )) promises.push(context.cluster!.tcn.api.guilds(guild.id).patch(guildEdit));
-   
+
+    const userGuilds = { ...user?.guilds };
+    if (args.for) userGuilds[args.for] = userRoles & roles.GUILD;
+
     for (const [,guild] of Object.entries(guilds)) {
-      const member = user && context.client.guilds.get(guild.id)?.members.get(user.id);
+      const member = context.client.guilds.get(guild.id)?.members.get(args.user.id);
       if (!member) continue;
 
-      const current = Array.from(member.roles.keys());
-      const roles = current.filter(role => args.for 
-        ? !Object.values(guild.roles).includes(role) 
-        : [guild.roles.observer, guild.roles.exec]
-      );
-
-      if (member.user.bot) roles.push(guild.roles.bot);
-
-      if (user) {
-        if (guildEdit.owner === user.id) roles.push(guild.roles.owner);
-        if (guildEdit.advisor === user.id) roles.push(guild.roles.advisor);
-        if (guildEdit.voter === user.id && guild.roles.voter) roles.push(guild.roles.voter);
-
-        for (const [g, r] of Object.entries(user.guilds)) {
-          const role = guild.roles[g];
-          const allowed = !guild.singleColorRole || r & ((1<<6) | (1<<7)) || guildEdit.owner === user.id || guildEdit.advisor === user.id;
-          if (allowed && role) roles.push(role);
-        }
-      }
-
-      if (
-        current.some(role => !roles.includes(role))
-        || roles.some(role => !current.includes(role))
-      ) promises.push(member.edit({ roles }));
+      promises.push(await updateRoles(member, {
+        roles: userRoles,
+        guilds: userGuilds,
+      }));
     }
 
     await Promise.all(promises);
