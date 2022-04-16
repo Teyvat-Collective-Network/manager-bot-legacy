@@ -153,11 +153,11 @@ export default class PromoteCommand extends BaseSlashCommand {
     const user = context.cluster!.tcn.users.get(args.user.id);
     const guild = args.for && context.cluster!.tcn.guilds.get(args.for);
 
-    if (!guild) return context.editOrRespond({
-      content: 'Guild not found',
-      components: [],
-      flags: MessageFlags.EPHEMERAL,
-    });
+    // if (!guild) return context.editOrRespond({
+    //   content: 'Guild not found',
+    //   components: [],
+    //   flags: MessageFlags.EPHEMERAL,
+    // });
 
     const guildRoles = context.data.values?.reduce((acc, role) => acc | (
       ['VOTER', 'OWNER', 'ADVISOR', 'EXEC', 'OBSERVER'].includes(role) ? 0 : roles[role as keyof typeof names]
@@ -169,6 +169,7 @@ export default class PromoteCommand extends BaseSlashCommand {
     const guildEdit = Object.fromEntries(['VOTER', 'OWNER', 'ADVISOR'].map(role => {
       const key = role.toLowerCase()
       const prop = role.toLowerCase() + 'Id' as 'voterId' | 'ownerId' | 'advisorId';
+      if (!guild) return [key, ''];
       if (context.data.values!.includes(role)) return [key, args.user.id];
       if (args.options.includes(role as keyof typeof names) && guild[prop] === args.user.id) return [key, null]; 
       return [key, guild[prop]];
@@ -177,7 +178,7 @@ export default class PromoteCommand extends BaseSlashCommand {
     const promises = [];
 
     if (user) {
-      if (guildRoles !== (user.roles & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles }));
+      if (guild && guildRoles !== (user.roles & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles }));
       if (user.exec !== exec) promises.push(exec
         ? context.cluster!.tcn.api.users.execs.put({ user: user.id })
         : context.cluster!.tcn.api.users.execs(user.id).delete()
@@ -188,18 +189,21 @@ export default class PromoteCommand extends BaseSlashCommand {
       );
     }
 
-    if (
+    if (guild && (
       guild.advisorId !== guildEdit.advisor
       || guild.ownerId !== guildEdit.owner
       || guild.voterId !== guildEdit.voter
-    ) promises.push(context.cluster!.tcn.api.guilds(guild.id).patch(guildEdit));
+    )) promises.push(context.cluster!.tcn.api.guilds(guild.id).patch(guildEdit));
    
     for (const [,guild] of Object.entries(guilds)) {
       const member = user && context.client.guilds.get(guild.id)?.members.get(user.id);
       if (!member) continue;
 
       const current = Array.from(member.roles.keys());
-      const roles = current.filter(role => !Object.values(guild.roles).includes(role));
+      const roles = current.filter(role => args.for 
+        ? !Object.values(guild.roles).includes(role) 
+        : [guild.roles.observer, guild.roles.exec]
+      );
 
       if (member.user.bot) roles.push(guild.roles.bot);
 
