@@ -173,7 +173,7 @@ export default class PromoteCommand extends BaseSlashCommand {
         : context.data.values!.includes(role)
           ? acc | roles[role as keyof typeof names]
           : acc & ~roles[role as keyof typeof names]
-    ), (user?.roles || 0) & roles.DB)
+    ), (args.for && user?.guilds[args.for] || 0) & roles.DB)
       | (guildEdit.owner === args.user.id ? roles.OWNER : 0)
       | (guildEdit.advisor === args.user.id ? roles.ADVISOR : 0)
       | (guildEdit.voter === args.user.id ? roles.VOTER : 0)

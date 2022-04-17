@@ -17,22 +17,24 @@ const names = [
 
 export async function updateRoles(member: Member, user: { roles: number, guilds: { [k: string]: number } } | undefined = member.client.cluster!.tcn.users.get(member.id)) {
   const guild = Object.entries(guilds).find(([,guild]) => guild.id === member.guildId)?.[1];
-  if (!user || !guild) return;
+  if (!guild) return;
 
   const before = Array.from(member.roles.keys());
   const after = before.filter(role => !Object.values(guild.roles).includes(role));
 
   if (member.user.bot) after.push(guild.roles.BOT);
 
-  for (let i = 0; i <= 10; i++) {
-    if (user.roles & (1<<i) && names[i] in guild.roles) after.push(guild.roles[names[i]]);
-  }
-  if (user.roles & ((1<<9)-1) && 'STAFF' in guild.roles) after.push(guild.roles['STAFF'])
-
-  for (const [g, r] of Object.entries(user.guilds)) {
-    const role = guild.roles[g];
-    const allowed = guild.singleColorRole ? r & ((1<<6) | (1<<7)) : r;
-    if (allowed && role) after.push(role);
+  if (user) {
+    for (let i = 0; i <= 10; i++) {
+      if (user.roles & (1<<i) && names[i] in guild.roles) after.push(guild.roles[names[i]]);
+    }
+    if (user.roles & ((1<<9)-1) && 'STAFF' in guild.roles) after.push(guild.roles['STAFF']);
+  
+    for (const [g, r] of Object.entries(user.guilds)) {
+      const role = guild.roles[g];
+      const allowed = guild.singleColorRole ? r & ((1<<6) | (1<<7)) : r;
+      if (allowed && role) after.push(role);
+    }
   }
   
   return (

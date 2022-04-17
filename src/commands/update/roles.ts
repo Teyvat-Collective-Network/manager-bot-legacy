@@ -18,6 +18,8 @@ export class UpdateRolesCommand extends BaseCommandOption {
     const guild = Object.entries(guilds).find(([,guild]) => guild.id === context.guildId)?.[1];
     if (!guild) return reply('I don\'t manage this guild');
 
+    console.log(context.guild.members.size);
+    
     for (const member of context.guild.members.values()) {
       await updateRoles(member);
     }
