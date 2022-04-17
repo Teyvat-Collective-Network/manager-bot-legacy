@@ -134,6 +134,7 @@ export default class PromoteCommand extends BaseSlashCommand {
       }
     }) as (keyof typeof names)[];
 
+
     context.editOrRespond({
       content: `<@${args.user.id}>${args.for ? ` **|** ${context.cluster!.tcn.guilds.get(args.for)?.name}` : ''}`,
       components: [new ComponentActionRow().addSelectMenu({
@@ -141,7 +142,7 @@ export default class PromoteCommand extends BaseSlashCommand {
         options: options.map(role => ({
           label: names[role],
           value: role,
-          default: !!((subject?.roles || 0) & roles[role]),
+          default: !!((subject ? (args.for ? subject.guilds[args.for] : 0) | (subject.roles & (roles.EXEC | roles.OBSERVER)) : 0) & roles[role]),
         })),
         maxValues: options.length,
         min_values: 0,
@@ -168,7 +169,7 @@ export default class PromoteCommand extends BaseSlashCommand {
       return [key, guild[prop]];
     } )) as { voter: string, owner: string, advisor: string };
 
-    const userRoles = args.options.reduce((acc, role) => (
+    const guildRoles = args.options.reduce((acc, role) => (
       ['VOTER', 'OWNER', 'ADVISOR', 'EXEC', 'OBSERVER'].includes(role) ? acc 
         : context.data.values!.includes(role)
           ? acc | roles[role as keyof typeof names]
@@ -184,7 +185,7 @@ export default class PromoteCommand extends BaseSlashCommand {
     const promises = [];
 
     if (user) {
-      if (guild && (userRoles & roles.DB) !== (user.roles & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: userRoles & roles.DB }));
+      if (guild && (guildRoles & roles.DB) !== (user.guilds[args.for!] & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles & roles.DB }));
       if (user.exec !== exec) promises.push(exec
         ? context.cluster!.tcn.api.users.execs.put({ user: user.id })
         : context.cluster!.tcn.api.users.execs(user.id).delete()
@@ -202,7 +203,9 @@ export default class PromoteCommand extends BaseSlashCommand {
     )) promises.push(context.cluster!.tcn.api.guilds(guild.id).patch(guildEdit));
 
     const userGuilds = { ...user?.guilds };
-    if (args.for) userGuilds[args.for] = userRoles & roles.GUILD;
+    if (args.for) userGuilds[args.for] = guildRoles & roles.GUILD;
+
+    const userRoles = Object.values(userGuilds).reduce((a,v) => a|v);
 
     for (const [,guild] of Object.entries(guilds)) {
       const member = context.client.guilds.get(guild.id)?.members.get(args.user.id);
