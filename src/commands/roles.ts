@@ -185,7 +185,7 @@ export default class PromoteCommand extends BaseSlashCommand {
     const promises = [];
 
     if (user) {
-      if (guild && (guildRoles & roles.DB) !== (user.guilds[args.for!] & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles & roles.DB }));
+      if (guild && (guildRoles & roles.DB) !== (user.guilds[guild.id] & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles & roles.DB }));
       if (user.exec !== exec) promises.push(exec
         ? context.cluster!.tcn.api.users.execs.put({ user: user.id })
         : context.cluster!.tcn.api.users.execs(user.id).delete()
@@ -194,6 +194,13 @@ export default class PromoteCommand extends BaseSlashCommand {
         ? context.cluster!.tcn.api.users.observers.put({ user: user.id })
         : context.cluster!.tcn.api.users.observers(user.id).delete()
       );
+    } else {
+      promises.push(context.cluster!.tcn.api.users.post({
+        id: args.user.id,
+        guilds: (guild && (guildRoles & roles.DB)) ? { [guild.id]: guildRoles & roles.DB } : {},
+        exec, observer,
+        roles: 0,
+      }));
     }
 
     if (guild && (
