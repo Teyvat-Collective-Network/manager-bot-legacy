@@ -45,7 +45,7 @@ export interface CommandArgs {
   for?: string;
 }
 
-export default class PromoteCommand extends BaseSlashCommand {
+export default class Roles extends BaseSlashCommand {
   name = COMMAND_NAME;
   description = 'set the roles a user fulfills';
   triggerLoadingAsEphemeral = true;
@@ -81,7 +81,7 @@ export default class PromoteCommand extends BaseSlashCommand {
       context.editOrRespond({
         content: 'You are not allowed to set any roles without server',
         flags: MessageFlags.EPHEMERAL,
-      });
+      }).catch(console.error);
       return false;
     } 
     if (
@@ -92,7 +92,7 @@ export default class PromoteCommand extends BaseSlashCommand {
     context.editOrRespond({
       content: 'You are not allowed to set any roles for that user',
       flags: MessageFlags.EPHEMERAL,
-    });
+    }).catch(console.error);
 
     return false;
   }
@@ -185,17 +185,14 @@ export default class PromoteCommand extends BaseSlashCommand {
     const promises = [];
 
     if (user) {
-      if (guild && (guildRoles & roles.DB) !== (user.guilds[guild.id] & roles.DB)) promises.push(context.cluster!.tcn.api.users(user.id).guilds.put({ guild: guild.id, roles: guildRoles & roles.DB }));
-      if (user.exec !== exec) promises.push(exec
-        ? context.cluster!.tcn.api.users.execs.put({ user: user.id })
-        : context.cluster!.tcn.api.users.execs(user.id).delete()
-      );
-      if (user.observer !== observer) promises.push(observer
-        ? context.cluster!.tcn.api.users.observers.put({ user: user.id })
-        : context.cluster!.tcn.api.users.observers(user.id).delete()
-      );
-    } else {
-      promises.push(context.cluster!.tcn.api.users.post({
+      if (guild && (guildRoles & roles.DB) !== (user.guilds[guild.id] & roles.DB) || user.exec !== exec || user.observer !== observer) promises.push(user.patch({
+        guilds: guild 
+          ? { ...user.guilds, [guild.id]: guildRoles & roles.DB } 
+          : user.guilds,
+        exec, observer,
+      }));
+    } else if (guildRoles & roles.DB || exec || observer) {
+      promises.push(context.cluster!.tcn.createUser({
         id: args.user.id,
         guilds: (guild && (guildRoles & roles.DB)) ? { [guild.id]: guildRoles & roles.DB } : {},
         exec, observer,
@@ -207,7 +204,10 @@ export default class PromoteCommand extends BaseSlashCommand {
       guild.advisorId !== guildEdit.advisor
       || guild.ownerId !== guildEdit.owner
       || guild.voterId !== guildEdit.voter
-    )) promises.push(context.cluster!.tcn.api.guilds(guild.id).patch(guildEdit));
+    )) promises.push(guild.patch(guildEdit));
+
+    await Promise.all(promises);
+
 
     const userGuilds = { ...user?.guilds };
     if (args.for) userGuilds[args.for] = guildRoles & roles.GUILD;
@@ -218,13 +218,11 @@ export default class PromoteCommand extends BaseSlashCommand {
       const member = context.client.guilds.get(guild.id)?.members.get(args.user.id);
       if (!member) continue;
 
-      promises.push(await updateRoles(member, {
+      await updateRoles(member, {
         roles: userRoles,
         guilds: userGuilds,
-      }));
+      });
     }
-
-    await Promise.all(promises);
 
 
     context.editOrRespond({

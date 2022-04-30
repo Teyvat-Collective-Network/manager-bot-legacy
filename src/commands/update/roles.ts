@@ -6,7 +6,7 @@ import { updateRoles } from '../../lib/update';
 
 export const COMMAND_NAME = 'roles';
 
-export class UpdateRolesCommand extends BaseCommandOption {
+export class UpdateRoles extends BaseCommandOption {
   name = COMMAND_NAME;
   description = 'force update all managed user roles';
   triggerLoadingAsEphemeral = true;
@@ -17,8 +17,6 @@ export class UpdateRolesCommand extends BaseCommandOption {
     
     const guild = Object.entries(guilds).find(([,guild]) => guild.id === context.guildId)?.[1];
     if (!guild) return reply('I don\'t manage this guild');
-
-    console.log(context.guild.members.size);
     
     for (const member of context.guild.members.values()) {
       await updateRoles(member);

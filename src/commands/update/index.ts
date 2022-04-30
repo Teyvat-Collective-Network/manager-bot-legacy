@@ -1,8 +1,8 @@
 import { Permissions } from 'detritus-client/lib/constants';
 import { BaseSlashCommand } from '../baseCommand';
-import { UpdateRolesCommand } from './roles';
+import { UpdateRoles } from './roles';
 
-export default class UpdateCommand extends BaseSlashCommand {
+export default class Update extends BaseSlashCommand {
   name = 'update';
   description = 'force updates';
   permissions = [Permissions.ADMINISTRATOR];
@@ -11,7 +11,7 @@ export default class UpdateCommand extends BaseSlashCommand {
   constructor() {
     super({
       options: [
-        new UpdateRolesCommand(),
+        new UpdateRoles(),
       ],
     });
   }
