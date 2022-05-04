@@ -142,7 +142,7 @@ export default class Roles extends BaseSlashCommand {
         options: options.map(role => ({
           label: names[role],
           value: role,
-          default: !!((subject ? (args.for ? subject.guilds[args.for] : 0) | (subject.roles & (roles.EXEC | roles.OBSERVER)) : 0) & roles[role]),
+          default: !!((subject ? (args.for && subject.memberIn(args.for)?.roles || 0) | (subject.roles & (roles.EXEC | roles.OBSERVER)) : 0) & roles[role]),
         })),
         maxValues: options.length,
         min_values: 0,
@@ -185,7 +185,11 @@ export default class Roles extends BaseSlashCommand {
     const promises = [];
 
     if (user) {
-      if (guild && (guildRoles & roles.DB) !== (user.guilds[guild.id] & roles.DB) || user.exec !== exec || user.observer !== observer) promises.push(user.patch({
+      if (
+        guild && (guildRoles & roles.DB) !== (user.guilds[guild.id] & roles.DB)
+        || user.exec !== exec
+        || user.observer !== observer
+      ) promises.push(user.patch({
         guilds: guild 
           ? { ...user.guilds, [guild.id]: guildRoles & roles.DB } 
           : user.guilds,
