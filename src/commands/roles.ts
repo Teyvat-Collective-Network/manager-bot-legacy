@@ -67,6 +67,7 @@ export default class Roles extends BaseSlashCommand {
           return context.respond({ choices: guilds
             .filter((guild) => guild.name.toLowerCase().startsWith(query) || guild.character.startsWith(query))
             .map(guild => ({ name: guild.name, value: guild.id }))
+            .slice(0, 25)
           });
         }
       }],
