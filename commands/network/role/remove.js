@@ -1,4 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
+import * as util from '../../../lib/util.js';
 import parent from './index.js';
 
 parent.subcommand({

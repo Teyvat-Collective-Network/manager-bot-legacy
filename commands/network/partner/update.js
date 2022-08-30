@@ -45,7 +45,7 @@ parent.subcommand({
   const inviteString = interaction.options.getString('invite');
   const invite = inviteString && await interaction.client.fetchInvite(inviteString);
   if (invite) {
-    if (invite.guild.id !== guild.id) return reply('The provided invite belongs to another server.');
+    if (invite.guild.id !== apiData.guild.id) return reply('The provided invite belongs to another server.');
     if (invite.expiresTimestamp) return reply('The provided invite is not permantent, please provide a permanent invite instead.');
     if (invite.guild.vanityURLCode === invite.code) return reply('The provided invite seems to be the server\'s vanity invite, please use a non-vanity invite instead.');
   }
@@ -58,11 +58,11 @@ parent.subcommand({
   if (voterInt === 1 && !advisor) return reply('The advisor can\'t be the voter if there\'s no advisor.');
   const voter = [owner, advisor, null][voterInt || 0];
 
-  const success = await interaction.client.tcn.editGuild({
-    invite: invite.code || undefined,
+  const success = await interaction.client.tcn.editGuild(apiData.guild.id, {
+    invite: invite?.code || undefined,
     name: interaction.options.getString('name') || undefined,
     owner, advisor, voter,
-  });
+  }).catch(() => {});
 
   return reply(success
     ? `Successfully updated ${apiData.guild.name}.`

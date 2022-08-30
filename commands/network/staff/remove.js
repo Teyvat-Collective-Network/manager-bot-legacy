@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
 import * as autocomplete from '../../../lib/autocomplete.js';
+import * as util from '../../../lib/util.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -14,7 +15,6 @@ parent.subcommand({
     type: ApplicationCommandOptionType.String,
     name: 'server',
     description: 'The server the user is not staff in anymore',
-    required: true,
     autocomplete: true,
     onAutocomplete: autocomplete.server,
   }],
