@@ -10,7 +10,7 @@ const client = new Bot({
   events: await util.loader('events'),
   owner: '659488296820408355',
   register: {
-    global: false,
+    global: !!process.env.PRODUCTION,
     guilds: [
       '804174916907171870',
       '878812623725002752',
