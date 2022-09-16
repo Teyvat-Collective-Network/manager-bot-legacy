@@ -8,9 +8,12 @@ parent.subcommand({
   await interaction.deferReply({ ephemeral: true });
 
   const members = await interaction.guild.members.fetch();
+  const array = [...members.values()]
 
-  await updateMembers(members);
-  await updateAPI(members);
+  console.log(members);
+
+  await updateMembers(array);
+  await updateAPI(array);
 
   return interaction.editReply(`Synchronized roles for all ${members.size} members.`);
 });
