@@ -30,7 +30,7 @@ parent.subcommand({
   const success = await interaction.client.tcn.removeUserGuild(user.id, apiData.guild.id).catch(e => e);
 
   return reply(success instanceof Error
-    ? `Successfully removed ${user} as staff from ${apiData.guild.name}.`
-    : `Failed removing ${user} as staff from ${apiData.guild.name}.`
+    ? `Failed removing ${user} as staff from ${apiData.guild.name}.`
+    : `Successfully removed ${user} as staff from ${apiData.guild.name}.`
   );
 });

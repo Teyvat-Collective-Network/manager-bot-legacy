@@ -16,7 +16,7 @@ parent.subcommand({
   const user = interaction.options.getUser('user');
   const apiUser = await interaction.client.tcn.fetchUser(user.id).catch(() => {});
 
-  return reply(apiUser
+  return reply(apiUser?.roles.length
     ? `TCN roles for ${user}: ${apiUser.roles.map(role => `\`${role}\``).join(', ')}.`
     : `${user} has no TCN roles.`
   );

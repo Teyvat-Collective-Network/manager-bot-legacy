@@ -30,7 +30,7 @@ parent.subcommand({
   const success = await interaction.client.tcn.addUserGuild(user.id, apiData.guild.id).catch(e => e);
 
   return reply(success instanceof Error
-    ? `Successfully added ${user} as staff for ${apiData.guild.name}.`
-    : `Failed adding ${user} as staff for ${apiData.guild.name}.`
+    ? `Failed adding ${user} as staff for ${apiData.guild.name}.`
+    : `Successfully added ${user} as staff for ${apiData.guild.name}.`
   );
 });
