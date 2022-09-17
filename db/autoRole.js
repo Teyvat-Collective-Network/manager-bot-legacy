@@ -5,4 +5,5 @@ export default new mongoose.Schema({
   guild: String,
   discord: String,
   api: String,
+  meta: {},
 });

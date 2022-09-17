@@ -6,8 +6,29 @@ export default new SlashCommand({
 }, async interaction => {
   return interaction.reply({
     content: interaction.client.generateInvite({
-      permissions: PermissionFlagsBits.Administrator,
-      scopes: [OAuth2Scopes.Bot, OAuth2Scopes.ApplicationsCommands],
+      permissions: [
+        PermissionFlagsBits.KickMembers,
+        PermissionFlagsBits.BanMembers,
+        PermissionFlagsBits.ManageChannels,
+        PermissionFlagsBits.ManageGuild,
+        PermissionFlagsBits.AddReactions,
+        PermissionFlagsBits.ViewChannel,
+        PermissionFlagsBits.SendMessages,
+        PermissionFlagsBits.ManageMessages,
+        PermissionFlagsBits.EmbedLinks,
+        PermissionFlagsBits.AttachFiles,
+        PermissionFlagsBits.ReadMessageHistory,
+        PermissionFlagsBits.UseExternalEmojis,
+        PermissionFlagsBits.ManageRoles,
+        PermissionFlagsBits.ManageWebhooks,
+        PermissionFlagsBits.ManageThreads,
+        PermissionFlagsBits.CreatePublicThreads,
+        PermissionFlagsBits.CreatePrivateThreads,
+        PermissionFlagsBits.UseExternalStickers,
+        PermissionFlagsBits.SendMessagesInThreads,
+        PermissionFlagsBits.ModerateMembers,
+      ].reduce((a, v) => a | v),
+      scopes: [ OAuth2Scopes.Bot ],
     }),
     ephemeral: true,
   });
