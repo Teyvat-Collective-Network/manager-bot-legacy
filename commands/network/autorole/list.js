@@ -10,7 +10,6 @@ parent.subcommand({
   const reply = content => interaction.reply({ content, ephemeral: true });
 
   const apiData = await getAPIData(interaction);
-  if (!apiData.guild) return reply('This guild does not seem to be part of the TCN.');
   if (!(apiData.observer || interaction.memberPermissions.has(PermissionFlagsBits.ManageRoles))) return reply('Only people with the MANAGE_ROLES permission, or a TCN observer can synchronize roles.');
 
   const autoRoles = await interaction.client.db.autoRoles.find({ type: { $ne: AutoRoleType.DiscordToAPIGuild } });

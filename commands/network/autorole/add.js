@@ -42,7 +42,6 @@ parent.subcommand({
   const role = interaction.options.getString('role');
 
   const apiData = await util.getAPIData(interaction);
-  if (!apiData.guild) return reply('This guild does not seem to be part of the TCN.');
   if (!(apiData.observer || interaction.memberPermissions.has(PermissionFlagsBits.ManageRoles))) return reply('Only people with the MANAGE_ROLES permission, or a TCN observer can synchronize roles.');
   if (type === AutoRoleType.DiscordToAPIRole && !apiData.observer) return reply('Only TCN observer can add synchronizations with that type.');
 
