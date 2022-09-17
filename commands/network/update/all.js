@@ -8,9 +8,7 @@ parent.subcommand({
   await interaction.deferReply({ ephemeral: true });
 
   const members = await interaction.guild.members.fetch();
-  const array = [...members.values()]
-
-  console.log(members);
+  const array = [...members.values()];
 
   await updateMembers(array);
   await updateAPI(array);
