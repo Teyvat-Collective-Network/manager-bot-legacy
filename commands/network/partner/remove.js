@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import * as autocomplete from '../../../lib/autocomplete.js';
-import * as util from '../../../lib/util.js';
+import { update, util, autocomplete } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -23,8 +22,11 @@ parent.subcommand({
 
   const success = await interaction.client.tcn.deleteGuild(apiData.guild.id).catch(() => {});
 
-  return reply(success
-    ? `Successfully removed ${apiData.guild.name} from the network.`
-    : `Failed to remove ${apiData.guild.name} from the network.`
-  );
+  if (!success) return reply(`Failed to remove ${apiData.guild.name} from the network.`);
+  await reply(`Successfully removed ${apiData.guild.name} from the network.`);
+
+  for (const userId of [apiData.guild.owner, apiData.guild.advisor]) {
+    const user = interaction.client.users.resolve(userId);
+    await user && update.updateUser(user);
+  }
 });

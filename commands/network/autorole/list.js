@@ -1,7 +1,7 @@
-import { util } from '@aroleaf/djs-bot';
-import parent from './index.js';
+import { PermissionFlagsBits, util } from '@aroleaf/djs-bot';
 import { AutoRoleType } from '../../../lib/constants.js';
 import { getAPIData } from '../../../lib/util.js';
+import parent from './index.js';
 
 parent.subcommand({
   name: 'list',

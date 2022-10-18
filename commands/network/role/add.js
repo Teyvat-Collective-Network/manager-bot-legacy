@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import * as util from '../../../lib/util.js';
+import { update, util } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -27,8 +27,8 @@ parent.subcommand({
   
   const success = await interaction.client.tcn.addUserRole(user.id, role).catch(e => e);
 
-  return reply(success instanceof Error
-    ? `Failed adding role ${role} to ${user}.`
-    : `Successfully added role ${role} to ${user}.`
-  );
+  if (success instanceof Error) return reply(`Failed adding role ${role} to ${user}.`);
+  await reply(`Successfully added role ${role} to ${user}.`)
+  
+  await update.updateUser(user);
 });

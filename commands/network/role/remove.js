@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import * as util from '../../../lib/util.js';
+import { update, util } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -27,8 +27,8 @@ parent.subcommand({
   
   const success = await interaction.client.tcn.removeUserRole(user.id, role).catch(e => e);
 
-  return reply(success instanceof Error
-    ? `Failed removing role ${role} from ${user}.`
-    : `Successfully removed role ${role} from ${user}.`
-  );
+  if (success instanceof Error) return reply(`Failed removing role ${role} from ${user}.`);
+  await reply(`Successfully removed role ${role} from ${user}.`);
+  
+  await update.updateUser(user);
 });

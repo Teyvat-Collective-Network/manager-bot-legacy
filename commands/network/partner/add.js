@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import * as autocomplete from '../../../lib/autocomplete.js';
-import * as util from '../../../lib/util.js';
+import { update, util, autocomplete } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -43,18 +42,18 @@ parent.subcommand({
   const apiData = await util.getAPIData(interaction);
   if (!apiData.observer) return reply('Sorry, only TCN observers can add servers to the network.');
 
-  const invite = await interaction.client.fetchInvite(interaction.options.getString('invite'), {  }).catch(() => {});
+  const invite = await interaction.client.fetchInvite(interaction.options.getString('invite')).catch(() => {});
   if (!invite) return reply('The provided invite seems to be invalid.');
   if (invite.expiresTimestamp) return reply('The provided invite is not permantent, please provide a permanent invite instead.');
   if (invite.guild.vanityURLCode === invite.code) return reply('The provided invite seems to be the server\'s vanity invite, please provide a non-vanity invite instead.');
 
-  const owner = interaction.options.getUser('owner').id;
-  const advisor = interaction.options.getUser('advisor')?.id;
-  if (owner === advisor) return reply('The owner can\'t also be the advisor.');
+  const owner = interaction.options.getUser('owner');
+  const advisor = interaction.options.getUser('advisor');
+  if (owner.id === advisor?.id) return reply('The owner can\'t also be the advisor.');
 
   const voterInt = interaction.options.getInteger('voter');
   if (voterInt === 1 && !advisor) return reply('The advisor can\'t be the voter if there\'s no advisor.');
-  const voter = [owner, advisor, null][voterInt || 0];
+  const voter = [owner.id, advisor?.id, null][voterInt || 0];
 
   const name = interaction.options.getString('name') || invite.guild.name;
 
@@ -62,11 +61,17 @@ parent.subcommand({
     id: invite.guild.id,
     invite: invite.code,
     character: interaction.options.getString('character'),
-    name, owner, advisor, voter,
+    owner: owner.id,
+    advisor: advisor?.id,
+    name, voter,
   }).catch(() => {});
 
-  return reply(guild 
-    ? `Successfully added ${name} to the network`
+  await reply(guild 
+    ? `Successfully added ${name} to the network.`
     : `Failed to add ${name}. Maybe they're already in the network?`
   );
+
+  for (const user of [owner, advisor]) {
+    await user && update.updateUser(user);
+  }
 });

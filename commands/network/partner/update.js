@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import * as autocomplete from '../../../lib/autocomplete.js';
-import * as util from '../../../lib/util.js';
+import { update, util, autocomplete } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -64,8 +63,16 @@ parent.subcommand({
     owner, advisor, voter,
   }).catch(() => {});
 
-  return reply(success
-    ? `Successfully updated ${apiData.guild.name}.`
-    : `Failed to update ${apiData.guild.name}.`
-  );
+  if (!success) return reply(`Failed to update ${apiData.guild.name}.`);
+  await reply(`Successfully updated ${apiData.guild.name}.`);
+
+  const users = [];
+  if (apiData.guild.owner !== owner) users.push(apiData.guild.owner, owner);
+  if (apiData.guild.advisor !== advisor) users.push(apiData.guild.advisor, advisor);
+  if (apiData.guild.voter !== voter) users.push(apiData.guild.voter, voter);
+
+  for (const userId of [...new Set(users)]) {
+    const user = interaction.client.users.resolve(userId);
+    await user && update.updateUser(user);
+  }
 });

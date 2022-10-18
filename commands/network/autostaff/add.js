@@ -1,7 +1,8 @@
 import { ApplicationCommandOptionType, PermissionFlagsBits } from '@aroleaf/djs-bot';
-import * as util from '../../../lib/util.js';
-import { AutoRoleType } from '../../../lib/constants.js';
+import { update, util, constants } from '../../../lib/index.js';
 import parent from './index.js';
+
+const { AutoRoleType } = constants;
 
 parent.subcommand({
   name: 'add',
@@ -31,5 +32,9 @@ parent.subcommand({
   if (await interaction.client.db.autoRoles.exists(data)) return reply('A synchronization with those settings already exists.');
   await interaction.client.db.autoRoles.create(data);
 
-  return reply('Synchronization successfully added.');
+  await reply('Synchronization successfully added. Roles will be updated in the background.');
+
+  for (const [,guild] of interaction.client.guilds.cache) {
+    await update.updateAPI([...guild.members.cache.values()]).catch(console.error);
+  }
 });

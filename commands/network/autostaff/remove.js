@@ -1,7 +1,8 @@
 import { ApplicationCommandOptionType, PermissionFlagsBits } from '@aroleaf/djs-bot';
-import * as util from '../../../lib/util.js';
-import { AutoRoleType } from '../../../lib/constants.js';
+import { update, util, constants } from '../../../lib/index.js';
 import parent from './index.js';
+
+const { AutoRoleType } = constants;
 
 parent.subcommand({
   name: 'remove',
@@ -32,5 +33,9 @@ parent.subcommand({
   if (!doc) return reply('A staff synchronization with those settings doesn\'t exist.');
   
   await doc.deleteOne();
-  return reply('Staff synchronization successfully removed.');
+  await reply('Staff synchronization successfully removed. Roles will be updated in the background.');
+
+  for (const [,guild] of interaction.client.guilds.cache) {
+    await update.updateAPI([...guild.members.cache.values()]).catch(console.error);
+  }
 });

@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import * as autocomplete from '../../../lib/autocomplete.js';
-import * as util from '../../../lib/util.js';
+import { update, util, autocomplete } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -29,8 +28,8 @@ parent.subcommand({
   
   const success = await interaction.client.tcn.removeUserGuild(user.id, apiData.guild.id).catch(e => e);
 
-  return reply(success instanceof Error
-    ? `Failed removing ${user} as staff from ${apiData.guild.name}.`
-    : `Successfully removed ${user} as staff from ${apiData.guild.name}.`
-  );
+  if (success instanceof Error) return reply( `Failed removing ${user} as staff from ${apiData.guild.name}.`);
+  await reply(`Successfully removed ${user} as staff from ${apiData.guild.name}.`);
+
+  await update.updateUser(user);
 });
