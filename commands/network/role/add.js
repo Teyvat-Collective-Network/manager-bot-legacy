@@ -28,7 +28,7 @@ parent.subcommand({
   const success = await interaction.client.tcn.addUserRole(user.id, role).catch(e => e);
 
   if (success instanceof Error) return reply(`Failed adding role ${role} to ${user}.`);
-  await reply(`Successfully added role ${role} to ${user}.`)
+  await reply(`Successfully added role ${role} to ${user}.`);
   
   await update.updateUser(user);
 });
