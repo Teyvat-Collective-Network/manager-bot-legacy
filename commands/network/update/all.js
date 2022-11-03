@@ -3,7 +3,7 @@ import { updateAPI, updateRoles } from '../../../lib/update.js';
 
 parent.subcommand({
   name: 'all',
-  description: 'update synchronized roles for all members of this server',
+  description: 'update synchronized roles for all users within the TCN',
 }, async interaction => {
   await interaction.deferReply({ ephemeral: true });
 
