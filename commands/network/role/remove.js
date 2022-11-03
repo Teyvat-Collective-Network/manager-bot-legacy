@@ -30,5 +30,5 @@ parent.subcommand({
   if (success instanceof Error) return reply(`Failed removing role ${role} from ${user}.`);
   await reply(`Successfully removed role ${role} from ${user}.`);
   
-  await update.updateUser(user);
+  await update.updateRoles([user]);
 });

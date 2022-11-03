@@ -25,8 +25,7 @@ parent.subcommand({
   if (!success) return reply(`Failed to remove ${apiData.guild.name} from the network.`);
   await reply(`Successfully removed ${apiData.guild.name} from the network.`);
 
-  for (const userId of [apiData.guild.owner, apiData.guild.advisor]) {
-    const user = interaction.client.users.resolve(userId);
-    await user && update.updateUser(user);
-  }
+  const owner = interaction.client.users.resolve(apiData.guild.owner);
+  const advisor = interaction.client.users.resolve(apiData.guild.advisor);
+  await update.updateRoles([owner, advisor].filter(u => u)).catch(console.error);
 });

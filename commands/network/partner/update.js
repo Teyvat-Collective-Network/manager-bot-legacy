@@ -71,8 +71,5 @@ parent.subcommand({
   if (apiData.guild.advisor !== advisor) users.push(apiData.guild.advisor, advisor);
   if (apiData.guild.voter !== voter) users.push(apiData.guild.voter, voter);
 
-  for (const userId of [...new Set(users)]) {
-    const user = interaction.client.users.resolve(userId);
-    await user && update.updateUser(user);
-  }
+  update.updateRoles([...new Set(users)].map(user => interaction.client.users.resolve(user)).filter(u => u));
 });

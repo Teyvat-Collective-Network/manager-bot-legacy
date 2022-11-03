@@ -71,7 +71,5 @@ parent.subcommand({
     : `Failed to add ${name}. Maybe they're already in the network?`
   );
 
-  for (const user of [owner, advisor]) {
-    await user && update.updateUser(user);
-  }
+  await update.updateRoles(advisor ? [owner, advisor] : [owner]).catch(console.error);
 });

@@ -1,5 +1,5 @@
 import parent from './index.js';
-import { updateUser } from '../../../lib/update.js';
+import { updateAPI, updateRoles } from '../../../lib/update.js';
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
 
 parent.subcommand({
@@ -17,7 +17,8 @@ parent.subcommand({
   const user = interaction.options.getUser('user');
   if (!user) return reply('Sorry, I couldn\'t find that user.');
 
-  await updateUser(user);
+  await updateRoles([user]);
+  await updateAPI([user]);
 
   return interaction.editReply(`Synchronized ${user}'s roles.`);
 });

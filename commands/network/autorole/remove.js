@@ -61,9 +61,7 @@ parent.subcommand({
   await doc.deleteOne();
   await reply('Synchronization successfully removed. Roles will be updated in the background.');
 
-  for (const [,guild] of interaction.client.guilds.cache) {
-    type === AutoRoleType.DiscordToAPIRole
-      ? await update.updateAPI([...guild.members.cache.values()]).catch(console.error)
-      : await update.updateMembers([...guild.members.cache.values()]).catch(console.error);
-  }
+  type === AutoRoleType.DiscordToAPIRole
+    ? await update.updateAPI([...interaction.client.users.cache.values()]).catch(console.error)
+    : await update.updateRoles([...interaction.client.users.cache.values()]).catch(console.error);
 });

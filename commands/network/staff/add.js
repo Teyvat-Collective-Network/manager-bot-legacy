@@ -31,5 +31,5 @@ parent.subcommand({
   if (success instanceof Error) return reply(`Failed adding ${user} as staff for ${apiData.guild.name}.`);
   await reply(`Successfully added ${user} as staff for ${apiData.guild.name}.`);
   
-  await update.updateUser(user);
+  await update.updateRoles([user]);
 });

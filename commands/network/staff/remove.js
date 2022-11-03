@@ -31,5 +31,5 @@ parent.subcommand({
   if (success instanceof Error) return reply( `Failed removing ${user} as staff from ${apiData.guild.name}.`);
   await reply(`Successfully removed ${user} as staff from ${apiData.guild.name}.`);
 
-  await update.updateUser(user);
+  await update.updateRoles([user]);
 });

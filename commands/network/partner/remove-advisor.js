@@ -28,5 +28,5 @@ parent.subcommand({
   await reply(`Successfully removed the advisor from ${apiData.guild.name}.`);
 
   const advisor = interaction.client.users.resolve(apiData.guild.advisor);
-  await advisor && update.updateUser(advisor);
+  await advisor && update.updateRoles([advisor]);
 });

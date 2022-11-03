@@ -33,8 +33,6 @@ parent.subcommand({
   await interaction.client.db.autoRoles.create(data);
 
   await reply('Synchronization successfully added. Roles will be updated in the background.');
-
-  for (const [,guild] of interaction.client.guilds.cache) {
-    await update.updateAPI([...guild.members.cache.values()]).catch(console.error);
-  }
+  
+  await update.updateAPI([...interaction.client.users.cache.values()]).catch(console.error);
 });
