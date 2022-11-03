@@ -13,7 +13,7 @@ parent.subcommand({
   if (!apiData.guild) return reply('This guild does not seem to be part of the TCN.');
   if (!(apiData.observer || interaction.memberPermissions.has(PermissionFlagsBits.ManageRoles))) return reply('Only the owner of the server, or a TCN observer can register staff roles.');
   
-  const roles = await interaction.client.db.autoRoles.find({ type: AutoRoleType.DiscordToAPIGuild });
+  const roles = await interaction.client.db.autoRoles.find({ guild: apiData.guild.id, type: AutoRoleType.DiscordToAPIGuild });
   return reply(roles.length 
     ? `This server\'s staff synchronizations: ${roles.map(role => `<@&${role.discord}>`).join(' ')}`
     : 'This server doesn\'t have any staff synchronizations',
