@@ -12,7 +12,7 @@ parent.subcommand({
   const apiData = await getAPIData(interaction);
   if (!(apiData.observer || interaction.memberPermissions.has(PermissionFlagsBits.ManageRoles))) return reply('Only people with the MANAGE_ROLES permission, or a TCN observer can synchronize roles.');
 
-  const autoRoles = await interaction.client.db.autoRoles.find({ type: { $ne: AutoRoleType.DiscordToAPIGuild } });
+  const autoRoles = await interaction.client.db.autoRoles.find({ guild: interaction.guild.id, type: { $ne: AutoRoleType.DiscordToAPIGuild } });
 
   const [toRole, rest] = util.partition(autoRoles, r => r.type === AutoRoleType.DiscordToAPIRole);
   const [fromRole, fromGuild] = util.partition(rest, r => r.type === AutoRoleType.APIRoleToDiscord);
