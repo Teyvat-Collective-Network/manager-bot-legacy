@@ -1,5 +1,5 @@
 import { Event, Events } from '@aroleaf/djs-bot';
-import { updateAPI, updateMembers } from '../../lib/update.js';
+import { updateAPI, updateRoles } from '../../lib/update.js';
 
 export default new Event({
   event: Events.GuildMemberUpdate,
@@ -7,5 +7,5 @@ export default new Event({
   const different = old.roles.cache.size !== member.roles.cache.size || old.roles.cache.every(r => member.roles.resolve(r.id));
   if (!different) return;
   await updateAPI([member.user]);
-  await updateMembers([member.user]);
+  await updateRoles([member.user]);
 });
