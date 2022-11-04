@@ -5,5 +5,5 @@ export default new Event({
 }, async guild => {
   await guild.members.fetch();
   console.log(`cached ${guild.members.cache.size} members for ${guild.name}`);
-  console.log(`total cached users: ${client.users.cache.size}`);
+  console.log(`total cached users: ${guild.client.users.cache.size}`);
 })
