@@ -3,10 +3,14 @@ import TCN from '@aroleaf/tcn-api';
 import 'dotenv/config';
 
 import Database from './db/index.js';
+import { getBanshareCommands } from './lib/banshare-compat.js';
+
+const ownCommands = await util.loader('commands');
+const banshareCommands = await getBanshareCommands();
 
 const client = new Bot({
   intents: [1<<0, 1<<1, 1<<9],
-  commands: await util.loader('commands'),
+  commands: ownCommands.concat(banshareCommands),
   events: await util.loader('events'),
   owner: '659488296820408355',
   register: {
