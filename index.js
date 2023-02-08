@@ -1,4 +1,4 @@
-import { Bot, util } from '@aroleaf/djs-bot';
+import { Bot, Partials, util } from '@aroleaf/djs-bot';
 import TCN from '@aroleaf/tcn-api';
 import 'dotenv/config';
 
@@ -9,16 +9,19 @@ const ownCommands = await util.loader('commands');
 const banshareCommands = await getBanshareCommands();
 
 const client = new Bot({
-  intents: [1<<0, 1<<1, 1<<9],
+  intents: [1<<0, 1<<1, 1<<9, 1<<12, 1<<15],
+  partials: [Partials.Channel],
   commands: ownCommands.concat(banshareCommands),
   events: await util.loader('events'),
   owner: '659488296820408355',
   register: {
     global: !!process.env.PRODUCTION,
     guilds: [
-      '804174916907171870',
-      '878812623725002752',
-      '838473416310652998',
+      // TODO revert this
+      // '804174916907171870',
+      // '878812623725002752',
+      // '838473416310652998',
+      '927153548339343360',
     ],
   },
 });
