@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType } from "@aroleaf/djs-bot";
+import { ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from "@aroleaf/djs-bot";
 import parent from './index.js';
 
 parent.subcommand({
@@ -14,6 +14,13 @@ parent.subcommand({
   const reply = content => interaction.reply({ content, ephemeral: true });
 
   const channel = interaction.options.getChannel('channel');
+
+  if (channel &&
+    !channel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.ViewChannel
+      | PermissionFlagsBits.SendMessages
+      | PermissionFlagsBits.EmbedLinks)) {
+    return await reply('The bot must have View Channel, Send Messages, and Embed Links in the log channel.');
+  }
 
   const old = await interaction.client.db.modmailSettings.findOneAndUpdate(
     { guild: interaction.guild.id },

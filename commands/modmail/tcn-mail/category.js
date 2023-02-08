@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType, escapeInlineCode } from '@aroleaf/djs-bot';
+import { ApplicationCommandOptionType, ChannelType, escapeInlineCode, PermissionFlagsBits } from '@aroleaf/djs-bot';
 import parent from './index.js';
 
 parent.subcommand({
@@ -15,6 +15,14 @@ parent.subcommand({
   const reply = content => interaction.reply({ content, ephemeral: true });
 
   const category = interaction.options.getChannel('category');
+
+  if (!category.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.ViewChannel
+    | PermissionFlagsBits.SendMessages
+    | PermissionFlagsBits.EmbedLinks
+    | PermissionFlagsBits.AttachFiles
+    | PermissionFlagsBits.ManageChannels)) {
+    return await reply('The bot must have View Channel, Send Messages, Embed Links, Attach Files, and Manage Channels in the modmail category.');
+  }
 
   await interaction.client.db.modmailSettings.findOneAndUpdate(
     { guild: interaction.guild.id },
