@@ -6,9 +6,9 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@aroleaf/djs-bot": "^2.1.13",
+    "@aroleaf/djs-bot": "^4.1.0",
     "@aroleaf/tcn-api": "^4.1.0",
-    "discord-markdown-embeds": "^2.0.5",
+    "discord-markdown-embeds": "^3.6.0",
     "dotenv": "^16.0.3",
     "fzy.js": "^0.4.1",
     "mongoose": "^6.7.2"
