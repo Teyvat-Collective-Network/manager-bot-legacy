@@ -2,24 +2,29 @@ import { SlashCommand } from "@aroleaf/djs-bot";
 
 export default new SlashCommand({
   name: 'close',
-  description: 'Close this modmail thread',
-  dmPermission: true,
+  description: 'Close your modmail thread',
+  defaultMemberPermissions: "0",
 }, async interaction => {
-  const reply = content => interaction.reply({ content, ephemeral: true });
+  const reply = (content, ephemeral = true) => interaction.reply({ content, ephemeral });
 
-  let thread;
+  if (interaction.inGuild()) return await reply('This command is for users to close their thread from DMs. Please use **/tcn-mail close**.');
 
-  if (interaction.inGuild()) {
-    thread = await interaction.client.db.threadUserToObserver.findOne({ targetChannel: interaction.channel.id });
-    if (!thread) {
-      const participant = await interaction.client.db.threadParticipant.findOne({ channel: interaction.channel.id });
-      if (participant) thread = await interaction.client.db.threadInterServer.findOne({ uuid: participant.thread });
-    }
-  } else {
-    thread = await interaction.client.db.threadUserToObserver.findOne({ user: interaction.user.id });
-  }
+  const thread = await interaction.client.db.threadUserToObserver.findOne({ user: interaction.user.id, open: true });
 
-  if (!thread) return await reply(interaction.inGuild() ? 'This is not a modmail thread.' : 'You do not have an open modmail thread.');
+  if (!thread) return await reply('You do not have an open modmail thread.');
 
-  return await reply('TODO...');
+  await interaction.client.db.threadUserToObserver.findOneAndUpdate({ uuid: thread.uuid }, { $set: { open: false } });
+
+  await reply(
+    `Your modmail thread is now closed. We hope we were able to help you. If you have any further inquiries, please open another modmail thread by simply sending another message. A transcript is available at ${process.env.MODMAIL_DOMAIN}/transcript/${thread.uuid}.`,
+    false
+  );
+  
+  await interaction.client.channels.cache.get(thread.targetChannel).send({
+    embeds: [{
+      title: 'Modmail Thread Closed',
+      description: 'This modmail thread was closed by the user.',
+      color: 0x2d3136,
+    }],
+  }).catch(() => {});
 })

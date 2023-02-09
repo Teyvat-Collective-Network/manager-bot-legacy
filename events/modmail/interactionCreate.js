@@ -51,7 +51,7 @@ export default new Event({
         if (target) {
           await interaction.client.db.threadUserToObserver.findOneAndUpdate(
             { uuid: target.uuid },
-            { $set: { targetChannel: channel.id }}
+            { $set: { targetChannel: channel.id } }
           );
 
           try {
@@ -136,6 +136,7 @@ export default new Event({
           description: 'Sending of this message was canceled. To send it, just send the message again.',
           color: Colors.Red,
         }],
+        components: [],
       })
     }
   }
