@@ -27,4 +27,4 @@ export default new SlashCommand({
       color: 0x2d3136,
     }],
   }).catch(() => {});
-})
+});

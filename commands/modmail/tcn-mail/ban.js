@@ -26,4 +26,4 @@ parent.subcommand({
   );
 
   await reply(old ? 'That user is already banned.' : `Banned ${user} from using modmail.`);
-})
+});

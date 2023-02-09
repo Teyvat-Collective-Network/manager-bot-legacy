@@ -9,18 +9,25 @@ parent.subcommand({
     name: 'message',
     description: 'The message to send',
     maxLength: 1024,
+  }, {
+    type: ApplicationCommandOptionType.Boolean,
+    name: 'ping-on-self-open',
+    description: 'Whether or not to ping when the thread is opened from this server',
   }],
   permissions: PermissionFlagsBits.ManageGuild,
 }, async interaction => {
   const reply = content => interaction.reply({ content, ephemeral: true });
 
-  const message = interaction.options.getString('message') ?? '';
+  const message = interaction.options.getString('message');
+  const pingOnSelfOpen = interaction.options.getBoolean('ping-on-self-open');
 
-  await interaction.client.db.modmailSettings.findOneAndUpdate(
-    { guild: interaction.guild.id },
-    { $set: { ping: message } },
-    { upsert: true }
-  );
+  const $set = {};
+  if (message !== null) $set.ping = message;
+  if (pingOnSelfOpen !== null) $set.pingOnSelfOpen = pingOnSelfOpen;
 
-  await reply(message ? 'Alert ping content has been set.' : 'Alert ping content has been cleared.');
+  if (Object.keys($set).length === 0) return await reply('No settings were updated.');
+
+  await interaction.client.db.modmailSettings.findOneAndUpdate({ guild: interaction.guild.id }, { $set }, { upsert: true });
+
+  await reply('Alert settings have been updated.');
 });

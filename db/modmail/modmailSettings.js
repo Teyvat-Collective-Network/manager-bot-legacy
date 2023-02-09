@@ -5,4 +5,5 @@ export default new mongoose.Schema({
   logChannel: String,
   category: String,
   ping: String,
+  pingOnSelfOpen: Boolean,
 });

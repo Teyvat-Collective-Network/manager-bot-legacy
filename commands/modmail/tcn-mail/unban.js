@@ -22,4 +22,4 @@ parent.subcommand({
   const old = await interaction.client.db.bannedUsers.findOneAndDelete({ user: user.id });
 
   await reply(old ? `Unbanned ${user} and they can now use modmail.` : 'That user is not banned.');
-})
+});
