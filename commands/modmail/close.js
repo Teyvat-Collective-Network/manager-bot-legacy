@@ -27,4 +27,12 @@ export default new SlashCommand({
       color: 0x2d3136,
     }],
   }).catch(() => {});
+  
+  await interaction.client.db.abandonedThread.create({ channel: thread.targetChannel });
+
+  await interaction.client.db.modmailMessage.create({
+    thread: thread.uuid,
+    type: 'user-incoming-close',
+    time: new Date(),
+  });
 });

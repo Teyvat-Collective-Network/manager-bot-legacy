@@ -143,9 +143,6 @@ export default new Event({
       if (!thread)
         return await interaction.update({ content: 'This does not appear to be a modmail thread.', embeds: [], components: [] });
 
-      if (thread.owner !== interaction.guild.id)
-        return await interaction.update({ content: 'You must be the owner server of this thread to add servers.', embeds: [], components: [] });
-
       const guilds = interaction.message.components.slice(0, -1).map(row => row.components[0].options.filter(option => option.default)).flat();
 
       await interaction.update({
@@ -156,6 +153,7 @@ export default new Event({
         components: [],
       });
 
+      const success = [];
       const failed = [];
 
       for (const guild of guilds) {
@@ -184,7 +182,7 @@ export default new Event({
         if (channel.id !== participant?.channel) {
           await interaction.client.db.threadParticipant.findOneAndUpdate(
             { thread: thread.uuid, guild: id },
-            { $set: { channel: channel.id, connected: true }, $setOnInsert: { subscribers: [], silenced: 0 } },
+            { $set: { channel: channel.id }, $setOnInsert: { subscribers: [], silenced: 0 } },
             { upsert: true }
           );
 
@@ -194,7 +192,7 @@ export default new Event({
             embeds: [{
               title: 'Modmail Thread Connected',
               description:
-                'This channel is now connected to a modmail thread. Use **/tcn-mail info** to see thread details, **/tcn-mail leave** if this was a mistake, and **/tcn-mail add-observers** if you need the observer team to be present.',
+                `This channel is now connected to a modmail thread started by ${interaction.guild.name}. Use **/tcn-mail info** to see thread details, **/tcn-mail leave** if this was a mistake, and **/tcn-mail add** if you would like to add the observer team to this thread.`,
               color: 0x2d3136,
             }],
           });
@@ -210,6 +208,19 @@ export default new Event({
             })
             .catch(() => {});
         }
+
+        success.push(id);
+      }
+
+      if (success.length > 0) {
+        await interaction.client.db.modmailMessage.create({
+          thread: thread.uuid,
+          type: 'cross-server-add',
+          time: new Date(),
+          author: interaction.user.id,
+          origin: interaction.guild.id,
+          files: success,
+        });
       }
 
       if (failed.length === 0) {
@@ -242,8 +253,9 @@ export default new Event({
     if (interaction.customId.match(/modmail\/update-server-add-list\[\d+\]/)) {
       const selected = interaction.message.components
         .slice(0, -1)
-        .filter((row) => row.custom_id !== interaction.customId)
-        .map((row) => row.components[0].options.filter((option) => option.default).map((option) => option.value))
+        .map(row => row.components[0])
+        .filter(dropdown => dropdown.data.custom_id !== interaction.customId)
+        .map(dropdown => dropdown.data.options.filter((option) => option.default).map((option) => option.value))
         .flat()
         .concat(interaction.values);
 

@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
-import { fetchModmailChannel, serverAddPrompt } from '../../../lib/modmail.js';
+import { fetchModmailChannel, getUUID, serverAddPrompt } from '../../../lib/modmail.js';
 import parent from './index.js';
 
 parent.subcommand({
@@ -30,13 +30,12 @@ parent.subcommand({
   const [channel, error] = await fetchModmailChannel(interaction.guild, null, { name });
   if (error) return await reply(error);
 
-  const uuid = crypto.randomUUID();
+  const uuid = await getUUID(interaction.client.db.threadInterServer);
 
   await interaction.client.db.threadInterServer.create({
     uuid,
     owner: interaction.guild.id,
     name,
-    escalated: interaction.guild.id === process.env.HQ,
     open: true
   });
 
@@ -44,7 +43,6 @@ parent.subcommand({
     thread: uuid,
     guild: interaction.guild.id,
     channel: channel.id,
-    connected: true,
     subscribers: [],
     silenced: 0,
   });

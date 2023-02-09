@@ -22,6 +22,8 @@ parent.subcommand({
 
   if (dm) {
     await interaction.client.db.threadUserToObserver.findOneAndUpdate({ uuid: thread.uuid }, { $set: { open: false } });
+    await interaction.client.db.abandonedThread.create({ channel: interaction.channel.id });
+
     await reply(
       `This thread is now closed. Once you no longer need it, use **/tcn-mail delete** to remove this channel. A transcript is available at ${process.env.MODMAIL_DOMAIN}/transcript/${thread.uuid}.`,
       false
@@ -35,8 +37,15 @@ parent.subcommand({
             'Thank you for reaching out to the TCN observer team. We hope we were able to help you. If you have any further inquiries, please open another modmail thread by simply sending another message.',
           color: 0x2d3136,
         }],
-      }).catch(() => {});    
+      }).catch(() => {});
+
+    await interaction.client.db.modmailMessage.create({
+      thread: thread.uuid,
+      type: 'user-outgoing-close',
+      time: new Date(),
+      author: interaction.user.id,
+    });
   } else {
-    // TODO
+    if (silence) return await reply('You cannot close a cross-server modmail thread silently.');
   }
 });
