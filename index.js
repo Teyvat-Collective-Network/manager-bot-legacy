@@ -5,6 +5,8 @@ import 'dotenv/config';
 import Database from './db/index.js';
 import { getBanshareCommands } from './lib/banshare-compat.js';
 
+process.on('uncaughtException', err => console.error(err));
+
 const ownCommands = await util.loader('commands');
 const banshareCommands = await getBanshareCommands();
 
