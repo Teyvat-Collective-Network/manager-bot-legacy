@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, PermissionFlagsBits } from "@aroleaf/djs-bot";
+import { ApplicationCommandOptionType, PermissionFlagsBits } from '@aroleaf/djs-bot';
 import parent from './index.js';
 
 parent.subcommand({
@@ -14,9 +14,10 @@ parent.subcommand({
     name: 'ping-on-self-open',
     description: 'Whether or not to ping when the thread is opened from this server',
   }],
-  permissions: PermissionFlagsBits.ManageGuild,
 }, async interaction => {
   const reply = content => interaction.reply({ content, ephemeral: true });
+
+  if (!interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)) return await reply('Insufficient permissions.');
 
   const message = interaction.options.getString('message');
   const pingOnSelfOpen = interaction.options.getBoolean('ping-on-self-open');

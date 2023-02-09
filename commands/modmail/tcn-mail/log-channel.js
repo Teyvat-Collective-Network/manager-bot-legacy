@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from "@aroleaf/djs-bot";
+import { ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from '@aroleaf/djs-bot';
 import parent from './index.js';
 
 parent.subcommand({
@@ -10,9 +10,10 @@ parent.subcommand({
     description: 'The channel to set',
     channelTypes: [ChannelType.GuildText],
   }],
-  permissions: PermissionFlagsBits.ManageGuild,
 }, async interaction => {
   const reply = content => interaction.reply({ content, ephemeral: true });
+
+  if (!interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)) return await reply('Insufficient permissions.');
 
   const channel = interaction.options.getChannel('channel');
 

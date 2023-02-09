@@ -1,5 +1,5 @@
-import { ComponentType, TextInputStyle } from "discord.js";
-import { baseReplyOptions, fetchThread, relay } from "../../../lib/modmail.js";
+import { ComponentType, TextInputStyle } from 'discord.js';
+import { baseReplyOptions, fetchThread, relay } from '../../../lib/modmail.js';
 
 import parent from './index.js';
 
@@ -23,7 +23,6 @@ parent.subcommand({
         style: TextInputStyle.Paragraph,
         placeholder: 'You have half an hour to reply.',
         required: true,
-        maxLength: 1024,
       }],
     }],
   });

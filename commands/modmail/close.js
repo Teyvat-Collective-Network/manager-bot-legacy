@@ -1,9 +1,9 @@
-import { SlashCommand } from "@aroleaf/djs-bot";
+import { SlashCommand } from '@aroleaf/djs-bot';
 
 export default new SlashCommand({
   name: 'close',
   description: 'Close your modmail thread',
-  defaultMemberPermissions: "0",
+  defaultMemberPermissions: '0',
 }, async interaction => {
   const reply = (content, ephemeral = true) => interaction.reply({ content, ephemeral });
 

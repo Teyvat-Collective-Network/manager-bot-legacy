@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from "@aroleaf/djs-bot";
-import { baseReplyOptions, relay } from "../../../lib/modmail.js";
+import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
+import { baseReplyOptions, relay } from '../../../lib/modmail.js';
 
 import parent from './index.js';
 
@@ -10,7 +10,6 @@ parent.subcommand({
     type: ApplicationCommandOptionType.String,
     name: 'content',
     description: 'The content to reply with',
-    maxLength: 1024,
   }, ...baseReplyOptions],
 }, async interaction => {
   await relay(interaction, {

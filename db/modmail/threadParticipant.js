@@ -5,7 +5,6 @@ export default new mongoose.Schema({
   guild: String,
   channel: String,
   connected: Boolean,
-  sendAll: Boolean,
   subscribers: [String],
   silenced: Number,
 });

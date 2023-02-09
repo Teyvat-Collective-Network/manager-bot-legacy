@@ -11,9 +11,10 @@ parent.subcommand({
     channelTypes: [ChannelType.GuildCategory],
     required: true,
   }],
-  permissions: PermissionFlagsBits.ManageGuild,
 }, async interaction => {
   const reply = content => interaction.reply({ content, ephemeral: true });
+
+  if (!interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)) return await reply('Insufficient permissions.');
 
   const category = interaction.options.getChannel('category');
 

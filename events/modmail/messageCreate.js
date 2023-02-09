@@ -1,4 +1,4 @@
-import { ButtonStyle, ChannelType, ComponentType, Event, Events } from "@aroleaf/djs-bot";
+import { ButtonStyle, ChannelType, ComponentType, Event, Events } from '@aroleaf/djs-bot';
 
 export default new Event({
   event: Events.MessageCreate,

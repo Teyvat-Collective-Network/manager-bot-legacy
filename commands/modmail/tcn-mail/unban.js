@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from "discord.js";
-import { util } from "../../../lib/index.js";
+import { ApplicationCommandOptionType } from 'discord.js';
+import { util } from '../../../lib/index.js';
 import parent from './index.js';
 
 parent.subcommand({

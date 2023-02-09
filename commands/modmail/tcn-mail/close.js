@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from "@aroleaf/djs-bot";
-import { fetchThread } from "../../../lib/modmail.js";
+import { ApplicationCommandOptionType } from '@aroleaf/djs-bot';
+import { fetchThread } from '../../../lib/modmail.js';
 
 import parent from './index.js';
 
