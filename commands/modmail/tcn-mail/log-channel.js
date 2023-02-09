@@ -9,7 +9,8 @@ parent.subcommand({
     name: 'channel',
     description: 'The channel to set',
     channelTypes: [ChannelType.GuildText],
-  }]
+  }],
+  permissions: PermissionFlagsBits.ManageGuild,
 }, async interaction => {
   const reply = content => interaction.reply({ content, ephemeral: true });
 

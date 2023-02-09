@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from "@aroleaf/djs-bot";
+import { ApplicationCommandOptionType, PermissionFlagsBits } from "@aroleaf/djs-bot";
 import parent from './index.js';
 
 parent.subcommand({
@@ -9,7 +9,8 @@ parent.subcommand({
     name: 'message',
     description: 'The message to send',
     maxLength: 1024,
-  }]
+  }],
+  permissions: PermissionFlagsBits.ManageGuild,
 }, async interaction => {
   const reply = content => interaction.reply({ content, ephemeral: true });
 
