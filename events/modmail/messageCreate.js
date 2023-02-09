@@ -7,6 +7,11 @@ export default new Event({
 
   // Check DMs for user-to-observer
   if (message.channel.type === ChannelType.DM) {
+    // If the user is banned, immediately abort
+    if (await message.client.db.bannedUsers.exists({ user: message.author.id })) {
+      return await message.reply('You are banned from using TCN modmail.');
+    }
+
     // If a thread exists, prompt to send; otherwise, prompt to create
     let embed;
 

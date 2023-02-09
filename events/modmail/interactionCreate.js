@@ -6,6 +6,10 @@ export default new Event({
 }, async interaction => {
   if (interaction.isButton()) {
     if (interaction.customId === 'modmail/confirm-send') {
+      if (await interaction.client.db.bannedUsers.exists({ user: interaction.user.id })) {
+        return await interaction.update({ content: 'You are banned from using TCN modmail.', embeds: [], components: [] });
+      }
+
       await interaction.update({ components: [] });
 
       let message;
