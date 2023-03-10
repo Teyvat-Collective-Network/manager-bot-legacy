@@ -1,5 +1,6 @@
 import { Bot, util } from '@aroleaf/djs-bot';
-import TCN from '@aroleaf/tcn-api';
+import { Client as TCN } from '@aroleaf/tcn-api';
+import { update, PartnerLists } from './lib/index.js';
 import 'dotenv/config';
 
 import Database from './db/index.js';
@@ -16,14 +17,17 @@ const client = new Bot({
   register: {
     global: !!process.env.PRODUCTION,
     guilds: [
-      '804174916907171870',
-      '878812623725002752',
-      '838473416310652998',
+      '1081241975363223643',
+      '1081241922372382770',
+      '1074629732521488434',
+      '1074629783440326679',
     ],
   },
 });
 
 client.tcn = new TCN(process.env.API_URL, process.env.API_TOKEN);
 client.db = new Database(process.env.DATABASE_URI);
+client.partnerlists = new PartnerLists(client);
+client.updater = new update.Updater(client);
 
 client.login(process.env.DISCORD_TOKEN);
