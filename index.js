@@ -1,6 +1,6 @@
 import { Bot, util } from '@aroleaf/djs-bot';
 import { Client as TCN } from '@aroleaf/tcn-api';
-import { update, PartnerLists } from './lib/index.js';
+import { PartnerLists } from './lib/index.js';
 import 'dotenv/config';
 
 import Database from './db/index.js';
@@ -28,6 +28,5 @@ const client = new Bot({
 client.tcn = new TCN(process.env.API_URL, process.env.API_TOKEN);
 client.db = new Database(process.env.DATABASE_URI);
 client.partnerlists = new PartnerLists(client);
-client.updater = new update.Updater(client);
 
 client.login(process.env.DISCORD_TOKEN);

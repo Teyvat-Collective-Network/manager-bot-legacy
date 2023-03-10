@@ -1,5 +1,5 @@
 ---
-color: 0x2d3136
+color: 0x2b2d31
 ---
 
 ![banner](https://i.imgur.com/sDdOtLU.png)
