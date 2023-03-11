@@ -34,7 +34,7 @@ parent.subcommand({
     : await channel.send(partnerlist.messages()[0]);
 
   const instance = {
-    channel: channel.id,
+    channel: webhook ? message.channel_id : channel.id,
     message: message.id,
     webhook, repost,
   }

@@ -33,7 +33,10 @@ parent.subcommand({
       if (msg) instance.repost ? await del().catch(console.error) : await edit(message).catch(e => failed.push(channel) && console.error(e));
       if (!msg || instance.repost) await send(message).then(m => interaction.client.db.partnerlists.updateOne(
         { 'instances.channel': instance.channel },
-        { $set: { 'instances.$.message': m.id } }
+        { $set: {
+          'instances.$.message': m.id,
+          ...instance.webhook ? { 'instances.$.channel': m.channel_id } : {},
+        } }
       )).catch(e => failed.push(channel) && console.error(e));
     }
   }

@@ -28,7 +28,10 @@ async function handler(interaction, { message, messageId}) {
   if (message) instance.repost ? await del().catch(console.error) : await edit(partnerlist.messages()[0]).catch(e => (failed = true) && console.error(e));
   if (!message || instance.repost) await send(partnerlist.messages()[0]).then(m => interaction.client.db.partnerlists.updateOne(
     { 'instances.channel': instance.channel },
-    { $set: { 'instances.$.message': m.id } }
+    { $set: {
+      'instances.$.message': m.id,
+      ...instance.webhook ? { 'instances.$.channel': m.channel_id } : {},
+    } }
   )).catch(e => (failed = true) && console.error(e));
 
   return reply(failed ? 'Failed to update partner list instance.' : 'Partner list instance updated.');
