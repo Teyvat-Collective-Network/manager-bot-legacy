@@ -33,8 +33,6 @@ parent.subcommand({
     ? await new WebhookClient({ url: webhook }).send(partnerlist.messages()[0])
     : await channel.send(partnerlist.messages()[0]);
 
-  console.log(message);
-
   const instance = {
     channel: channel.id,
     message: message.id,
