@@ -5,15 +5,17 @@ import parent from './index.js';
 async function handler(interaction, { message, messageId}) {
   const reply = content => interaction.reply({ content, ephemeral: true });
 
-  const apiData = await util.getAPIData(interaction);
-  if (!(apiData.observer || interaction.memberPermissions.has([PermissionFlagsBits.ManageMessages, PermissionFlagsBits.SendMessages]))) return reply('Only people with Manage Messages and Send Messages permissions, or a TCN observer can remove partner lists.');
-
+  
   const settings = await interaction.client.db.partnerlists.findOne({ guild: interaction.guild.id });
   const instance = settings.instances.find(instance => instance.message === messageId);
   if (!instance) return reply('That message is not a partner list instance.');
-
+  
   const channel = interaction.guild.channels.resolve(instance.channel);
   if (!channel || channel?.guild.id !== interaction.guild.id) return reply('That message is not in this server, or I do not have access to it.');
+  
+  const apiData = await util.getAPIData(interaction);
+  if (!(apiData.observer || interaction.member.permissionsIn(channel).has([PermissionFlagsBits.ManageMessages, PermissionFlagsBits.SendMessages]))) return reply('Only people with Manage Messages and Send Messages permissions, or a TCN observer can remove partner lists.');
+  
   message ||= await channel.messages.fetch(instance.message);
 
   const partnerlist = await interaction.client.partnerlists.get(settings.template || interaction.client.partnerlists.defaultTemplate, interaction.guild);
