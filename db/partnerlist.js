@@ -6,6 +6,7 @@ export default new mongoose.Schema({
   instances: [{
     channel: String,
     message: String,
+    webhook: String,
     repost: Boolean,
   }],
 });

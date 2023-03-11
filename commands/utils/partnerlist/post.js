@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CommandFlagsBitField, PermissionFlagsBits } from '@aroleaf/djs-bot';
+import { ApplicationCommandOptionType, CommandFlagsBitField, PermissionFlagsBits, WebhookClient } from '@aroleaf/djs-bot';
 import { util } from '../../../lib/index.js';
 import parent from './index.js';
 
@@ -19,7 +19,7 @@ parent.subcommand({
     name: 'webhook',
     description: 'If you want the bot to use a webhook instead of its own account, provide the webhook URL here.',
   }],
-}, async (interaction, { channel = interaction.channel, repost = false }) => {
+}, async (interaction, { channel = interaction.channel, repost = false, webhook }) => {
   const reply = content => interaction.reply({ content, ephemeral: true });
 
   const apiData = await util.getAPIData(interaction);
@@ -29,12 +29,16 @@ parent.subcommand({
   if (settings?.instances.some(instance => instance.channel === channel.id)) return reply('There\'s already a partner list instance in that channel. Use `/partnerlist remove` to remove it.');
   const partnerlist = await interaction.client.partnerlists.get(settings?.template || interaction.client.partnerlists.defaultTemplate, interaction.guild);
 
-  const message = await channel.send(partnerlist.messages()[0]);
+  const message = webhook
+    ? await new WebhookClient({ url: webhook }).send(partnerlist.messages()[0])
+    : await channel.send(partnerlist.messages()[0]);
+
+  console.log(message);
 
   const instance = {
     channel: channel.id,
     message: message.id,
-    repost,
+    webhook, repost,
   }
 
   await interaction.client.db.partnerlists.updateOne(
@@ -43,5 +47,5 @@ parent.subcommand({
     { upsert: true }
   );
 
-  return reply(`Partner list posted [here](${message.url}).`);
+  return reply(`Partner list posted${message.url ? `[here](${message.url})` : ''}.`);
 });

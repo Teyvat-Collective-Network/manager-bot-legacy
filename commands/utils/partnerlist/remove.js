@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, CommandFlagsBitField, ContextCommand, PermissionFlagsBits } from '@aroleaf/djs-bot';
+import { ApplicationCommandOptionType, ApplicationCommandType, CommandFlagsBitField, ContextCommand, PermissionFlagsBits, WebhookClient } from '@aroleaf/djs-bot';
 import { util } from '../../../lib/index.js';
 import parent from './index.js';
 
@@ -13,7 +13,10 @@ async function handler(interaction, { message, messageId}) {
   if (!instance) return reply('That message is not a partner list instance.');
 
   message ||= await interaction.client.channels.resolve(instance.channel)?.messages.fetch(instance.message);
-  if (message?.deletable) await message.delete();
+  message && (instance.webhook
+    ? new WebhookClient({ url: instance.webhook }).deleteMessage(message)
+    : message.deletable && await message.delete()
+  );
   await interaction.client.db.partnerlists.updateOne({ guild: interaction.guild.id }, { $pull: { instances: instance } });
 
   return reply('Partner list instance removed.');

@@ -1,4 +1,4 @@
-import { CommandFlagsBitField } from '@aroleaf/djs-bot';
+import { CommandFlagsBitField, parseWebhookURL, WebhookClient } from '@aroleaf/djs-bot';
 import { util } from '../../../lib/index.js';
 import parent from './index.js';
 
@@ -23,9 +23,15 @@ parent.subcommand({
     for (const instance of doc.instances) {
       const channel = guild.channels.resolve(instance.channel);
       if (!channel) continue;
-      const msg = await channel.messages.fetch(instance.message);      
-      if (msg) instance.repost ? await msg.delete().catch(console.error) : await msg.edit(message).catch(() => failed.push(channel));
-      if (!msg || instance.repost) await channel.send(message).catch(() => failed.push(channel)).then(m => interaction.client.db.partnerlists.updateOne(
+
+      const webhookClient = instance.webhook && new WebhookClient({ url: instance.webhook });
+      const send = (msg) => webhookClient ? webhookClient.send(msg) : channel.send(msg);
+      const edit = (msg) => webhookClient ? webhookClient.editMessage(instance.message, msg) : channel.messages.edit(instance.message, msg);
+      const del = () => webhookClient ? webhookClient.deleteMessage(instance.message) : channel.messages.delete(instance.message);
+      
+      const msg = await channel.messages.fetch(instance.message);
+      if (msg) instance.repost ? await del().catch(console.error) : await edit(message).catch(() => failed.push(channel));
+      if (!msg || instance.repost) await send(message).catch(() => failed.push(channel)).then(m => interaction.client.db.partnerlists.updateOne(
         { _id: doc._id, 'instances.channel': instance.channel },
         { $set: { 'instances.$.message': m.id } }
       ));
