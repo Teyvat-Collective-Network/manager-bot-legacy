@@ -2,7 +2,6 @@ import { CommandFlagsBitField, WebhookClient } from '@aroleaf/djs-bot';
 import { util } from '../../../lib/index.js';
 import parent from './index.js';
 
-// Updates all partner list instances.
 parent.subcommand({
   name: 'update',
   description: 'Update all partner list instances.',
@@ -31,15 +30,13 @@ parent.subcommand({
       const del = () => webhookClient ? webhookClient.deleteMessage(instance.message) : channel.messages.delete(instance.message);
       
       const msg = await channel.messages.fetch(instance.message).catch(() => {});
-      if (msg) instance.repost ? await del().catch(console.error) : await edit(message).catch(() => failed.push(channel));
-      if (!msg || instance.repost) await send(message).catch(() => failed.push(channel)).then(m => interaction.client.db.partnerlists.updateOne(
-        { _id: doc._id, 'instances.channel': instance.channel },
+      if (msg) instance.repost ? await del().catch(console.error) : await edit(message).catch(e => failed.push(channel) && console.error(e));
+      if (!msg || instance.repost) await send(message).then(m => interaction.client.db.partnerlists.updateOne(
+        { 'instances.channel': instance.channel },
         { $set: { 'instances.$.message': m.id } }
-      ));
+      )).catch(e => failed.push(channel) && console.error(e));
     }
   }
 
   return interaction.editReply(`Partner list update complete.${failed.length ? ` Failed to update: ${failed.map(channel => `[#${channel.name}](${channel.url}) in ${channel.guild.name}`).join(', ')}` : ''}`);
 });
-
-// updates a single partner list instance

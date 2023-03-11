@@ -15,29 +15,36 @@ async function handler(interaction, { message, messageId}) {
   const channel = interaction.guild.channels.resolve(instance.channel);
   if (!channel || channel?.guild.id !== interaction.guild.id) return reply('That message is not in this server, or I do not have access to it.');
   message ||= await channel.messages.fetch(instance.message);
-  message && (instance.webhook
-    ? new WebhookClient({ url: instance.webhook }).deleteMessage(message)
-    : message.deletable && await message.delete()
-  );
-  await interaction.client.db.partnerlists.updateOne({ guild: interaction.guild.id }, { $pull: { instances: instance } });
 
-  return reply('Partner list instance removed.');
+  const partnerlist = await interaction.client.partnerlists.get(settings.template || interaction.client.partnerlists.defaultTemplate, interaction.guild);
+
+  const webhookClient = instance.webhook && new WebhookClient({ url: instance.webhook });
+  const send = (msg) => webhookClient ? webhookClient.send(msg) : channel.send(msg);
+  const edit = (msg) => webhookClient ? webhookClient.editMessage(instance.message, msg) : channel.messages.edit(instance.message, msg);
+  const del = () => webhookClient ? webhookClient.deleteMessage(instance.message) : channel.messages.delete(instance.message);
+  let failed = false;
+  if (message) instance.repost ? await del().catch(console.error) : await edit(partnerlist.messages()[0]).catch(e => (failed = true) && console.error(e));
+  if (!message || instance.repost) await send(partnerlist.messages()[0]).then(m => interaction.client.db.partnerlists.updateOne(
+    { 'instances.channel': instance.channel },
+    { $set: { 'instances.$.message': m.id } }
+  )).catch(e => (failed = true) && console.error(e));
+
+  return reply(failed ? 'Failed to update partner list instance.' : 'Partner list instance updated.');
 }
 
 parent.subcommand({
-  name: 'remove',
-  description: 'Remove a partner list instance.',
+  name: 'update-instance',
+  description: 'Update a specific partner list instance.',
   flags: [CommandFlagsBitField.Flags.GUILD_ONLY],
   options: [{
     type: ApplicationCommandOptionType.String,
     name: 'message',
-    description: 'The message ID of the partner list instance to remove.',
-    required: true,
+    description: 'The message ID of the partner list instance to update.',
   }],
 }, async (interaction, { message }) => handler(interaction, { messageId: message }));
 
 export default new ContextCommand({
   type: ApplicationCommandType.Message,
-  name: 'remove partnerlist',
+  name: 'update partnerlist',
   flags: [CommandFlagsBitField.Flags.GUILD_ONLY],
-}, async (interaction, message) => handler(interaction, { message, messageId: message.id }));
+}, async (interaction, message) => handler(interaction, { message, messageId: message.id, message }));
