@@ -18,11 +18,20 @@ parent.subcommand({
   const failed = [];
   for (const doc of partnerlists) {
     const guild = interaction.client.guilds.resolve(doc.guild);
-    const partnerlist = await interaction.client.partnerlists.get(doc.template || interaction.client.partnerlists.defaultTemplate, guild);
+    let partnerlist;
+    try {
+      partnerlist = await interaction.client.partnerlists.get(doc.template || interaction.client.partnerlists.defaultTemplate, guild);
+    } catch(error) {
+      console.log(error);
+    }
     const message = partnerlist.messages()[0];
     for (const instance of doc.instances) {
       const channel = guild.channels.resolve(instance.channel);
       if (!channel) continue;
+      if (!partnerlist) {
+        failed.push(channel);
+        continue;
+      }
 
       const webhookClient = instance.webhook && new WebhookClient({ url: instance.webhook });
       const send = (msg) => webhookClient ? webhookClient.send(msg) : channel.send(msg);

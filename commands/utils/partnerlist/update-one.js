@@ -18,21 +18,27 @@ async function handler(interaction, { message, messageId}) {
   
   message ||= await channel.messages.fetch(instance.message);
 
-  const partnerlist = await interaction.client.partnerlists.get(settings.template || interaction.client.partnerlists.defaultTemplate, interaction.guild);
-
   const webhookClient = instance.webhook && new WebhookClient({ url: instance.webhook });
   const send = (msg) => webhookClient ? webhookClient.send(msg) : channel.send(msg);
   const edit = (msg) => webhookClient ? webhookClient.editMessage(instance.message, msg) : channel.messages.edit(instance.message, msg);
   const del = () => webhookClient ? webhookClient.deleteMessage(instance.message) : channel.messages.delete(instance.message);
+  
   let failed = false;
-  if (message) instance.repost ? await del().catch(console.error) : await edit(partnerlist.messages()[0]).catch(e => (failed = true) && console.error(e));
-  if (!message || instance.repost) await send(partnerlist.messages()[0]).then(m => interaction.client.db.partnerlists.updateOne(
-    { 'instances.channel': instance.channel },
-    { $set: {
-      'instances.$.message': m.id,
-      ...instance.webhook ? { 'instances.$.channel': m.channel_id } : {},
-    } }
-  )).catch(e => (failed = true) && console.error(e));
+  try {
+    const partnerlist = await interaction.client.partnerlists.get(settings.template || interaction.client.partnerlists.defaultTemplate, interaction.guild);
+    
+    if (message) instance.repost ? await del().catch(console.error) : await edit(partnerlist.messages()[0]).catch(e => (failed = true) && console.error(e));
+    if (!message || instance.repost) await send(partnerlist.messages()[0]).then(m => interaction.client.db.partnerlists.updateOne(
+      { 'instances.channel': instance.channel },
+      { $set: {
+        'instances.$.message': m.id,
+        ...instance.webhook ? { 'instances.$.channel': m.channel_id } : {},
+      } }
+    )).catch(e => (failed = true) && console.error(e));
+  } catch(error) {
+    console.log(error);
+    failed = true;
+  }
 
   return reply(failed ? 'Failed to update partner list instance.' : 'Partner list instance updated.');
 }
