@@ -57,7 +57,7 @@ parent.subcommand({
 
   const name = interaction.options.getString('name') || invite.guild.name;
 
-  const guild = await interaction.client.tcn.createGuild({
+  const guild = await interaction.client.tcn.addGuild({
     id: invite.guild.id,
     invite: invite.code,
     character: interaction.options.getString('character'),
