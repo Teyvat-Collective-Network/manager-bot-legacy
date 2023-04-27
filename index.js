@@ -10,7 +10,7 @@ const ownCommands = await util.loader('commands');
 const banshareCommands = await getBanshareCommands();
 
 const client = new Bot({
-  intents: [1<<0, 1<<1, 1<<9],
+  intents: [1<<0, 1<<1, 1<<9, 1<<15],
   commands: ownCommands.concat(banshareCommands),
   events: await util.loader('events'),
   owner: '659488296820408355',
