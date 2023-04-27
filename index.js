@@ -14,6 +14,7 @@ const client = new Bot({
   commands: ownCommands.concat(banshareCommands),
   events: await util.loader('events'),
   owner: '659488296820408355',
+  prefix: 'tcn.',
   register: {
     global: !!process.env.PRODUCTION,
     guilds: [
