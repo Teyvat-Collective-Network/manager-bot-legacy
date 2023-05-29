@@ -18,6 +18,10 @@ parent.subcommand({
   const failed = [];
   for (const doc of partnerlists) {
     const guild = interaction.client.guilds.resolve(doc.guild);
+    if (!guild) {
+      failed.push(doc.guild);
+      continue;
+    };
     let partnerlist;
     try {
       partnerlist = await interaction.client.partnerlists.get(doc.template || interaction.client.partnerlists.defaultTemplate, guild);
@@ -50,5 +54,5 @@ parent.subcommand({
     }
   }
 
-  return interaction.editReply(`Partner list update complete.${failed.length ? ` Failed to update: ${failed.map(channel => `[#${channel.name}](${channel.url}) in ${channel.guild.name}`).join(', ')}` : ''}`);
+  return interaction.editReply(`Partner list update complete.${failed.length ? ` Failed to update: ${failed.map(channelOrId => typeof channelOrId === 'string' ? channelOrId : `[#${channelOrId.name}](${channelOrId.url}) in ${channelOrId.guild.name}`).join(', ')}` : ''}`);
 });
