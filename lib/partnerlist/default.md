@@ -16,7 +16,7 @@ color: 0x2b2d31
 
 # _ _\
 **TCN Hub**
-{ hub.info } { hub.link }
+{ hub.info } { hub.url }
 
 # _ _\
 **Genshin Wizard**
