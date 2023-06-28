@@ -22,4 +22,8 @@ color: 0x2b2d31
 **Genshin Wizard**
 { genshin_wizard.info }
 
+# _ _\
+**Genshin Impact Tavern**
+{ genshin_impact_tavern.info }
+
 ![spacer](https://i.imgur.com/3yKSBha.png)
