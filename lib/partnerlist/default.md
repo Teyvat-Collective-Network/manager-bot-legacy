@@ -24,6 +24,6 @@ color: 0x2b2d31
 
 # _ _\
 **Genshin Impact Tavern**
-{ genshin_impact_tavern.info }
+{ tavern.info }
 
 ![spacer](https://i.imgur.com/3yKSBha.png)
