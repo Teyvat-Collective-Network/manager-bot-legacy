@@ -6,7 +6,7 @@ async function handler(interaction, { message, messageId}) {
   const reply = content => interaction.reply({ content, ephemeral: true });
 
   const settings = await interaction.client.db.partnerlists.findOne({ guild: interaction.guild.id });
-  const instance = settings.instances.find(instance => instance.message === messageId);
+  const instance = settings?.instances.find(instance => instance.message === messageId);
   if (!instance) return reply('That message is not a partner list instance.');
   
   const channel = interaction.guild.channels.resolve(instance.channel);
@@ -33,9 +33,16 @@ parent.subcommand({
     type: ApplicationCommandOptionType.String,
     name: 'message',
     description: 'The message ID of the partner list instance to remove.',
-    required: true,
   }],
-}, async (interaction, { message }) => handler(interaction, { messageId: message }));
+}, async (interaction, { message }) => {
+  if (!message) {
+    const settings = await interaction.client.db.partnerlists.findOne({ guild: interaction.guild.id });
+    message = settings?.instances.find(i => i.channel = interaction.channelId)?.message;
+    if (!message) return reply('There is no partnerlist instance registered in this channel.');
+  }
+
+  return handler(interaction, { messageId: message });
+});
 
 export default new ContextCommand({
   type: ApplicationCommandType.Message,
