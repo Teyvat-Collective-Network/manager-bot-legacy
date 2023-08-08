@@ -27,6 +27,7 @@ parent.subcommand({
       partnerlist = await interaction.client.partnerlists.get(doc.template || interaction.client.partnerlists.defaultTemplate, guild);
     } catch(error) {
       console.log(error);
+      continue;
     }
     const message = partnerlist.messages()[0];
     for (const instance of doc.instances) {
